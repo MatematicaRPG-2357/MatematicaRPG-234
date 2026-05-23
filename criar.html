@@ -442,6 +442,111 @@
       color: #00cc66;
     }
 
+    /* Modal de Personagem Já Criado */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      backdrop-filter: blur(5px);
+      animation: fadeIn 0.3s ease-out;
+      display: none;
+    }
+
+    .modal-overlay.show {
+      display: flex;
+    }
+
+    .modal-content {
+      background: linear-gradient(135deg, rgba(20, 25, 50, 0.95), rgba(30, 35, 60, 0.95));
+      border: 3px solid #f5c542;
+      border-radius: 20px;
+      padding: 40px;
+      max-width: 450px;
+      width: 90%;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+      animation: slideUp 0.4s ease-out;
+      text-align: center;
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(50px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .modal-header {
+      margin-bottom: 30px;
+    }
+
+    .modal-header h2 {
+      font-size: 32px;
+      color: #f5c542;
+      text-shadow: 0 0 20px rgba(245, 197, 66, 0.5);
+      margin-bottom: 15px;
+      letter-spacing: 2px;
+    }
+
+    .modal-header p {
+      color: #e0e0e0;
+      font-size: 16px;
+      line-height: 1.6;
+      margin-bottom: 20px;
+    }
+
+    .modal-buttons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+      margin-top: 30px;
+    }
+
+    .btn-modal {
+      padding: 15px 20px;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .btn-voltar-modal {
+      background-color: #141932;
+      color: #f5c542;
+      border: 2px solid #f5c542;
+    }
+
+    .btn-voltar-modal:hover {
+      background-color: #f5c542;
+      color: black;
+      transform: translateY(-2px);
+    }
+
+    .btn-ver-personagem {
+      background: linear-gradient(135deg, #f5c542 0%, #d4a017 100%);
+      color: black;
+      box-shadow: 0 5px 15px rgba(245, 197, 66, 0.3);
+    }
+
+    .btn-ver-personagem:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(245, 197, 66, 0.5);
+    }
+
     @media (max-width: 768px) {
       .form-row {
         grid-template-columns: 1fr;
@@ -609,9 +714,51 @@
     </div>
   </div>
 
+  <!-- Modal de Personagem Já Criado -->
+  <div class="modal-overlay" id="modalPersonagemJaCriado">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>⚠️ Personagem Já Criado</h2>
+        <p>Você já criou seu personagem.<br>Não é possível criar mais de um personagem por conta.</p>
+      </div>
+
+      <div class="modal-buttons">
+        <button class="btn-modal btn-voltar-modal" onclick="voltarHome()">← Voltar</button>
+        <button class="btn-modal btn-ver-personagem" onclick="irParaPersonagem()">👤 Ver Personagem</button>
+      </div>
+    </div>
+  </div>
+
   <script>
     let itensSelecionados = [];
     let profissaoSelecionada = '';
+
+    // Verificar se personagem já existe quando carregar a página
+    window.addEventListener('load', function() {
+      verificarPersonagemExistente();
+    });
+
+    function verificarPersonagemExistente() {
+      const personagemExistente = localStorage.getItem('personagem_nome');
+      if (personagemExistente) {
+        mostrarModalPersonagemJaCriado();
+      }
+    }
+
+    function mostrarModalPersonagemJaCriado() {
+      document.getElementById('modalPersonagemJaCriado').classList.add('show');
+      document.getElementById('nome').disabled = true;
+      document.getElementById('senha').disabled = true;
+      document.querySelectorAll('.profissao-card').forEach(el => el.style.pointerEvents = 'none');
+      document.querySelectorAll('.item').forEach(el => el.style.pointerEvents = 'none');
+      document.getElementById('fotoInput').disabled = true;
+      document.getElementById('desc').disabled = true;
+      document.querySelector('.btn-primary').disabled = true;
+    }
+
+    function irParaPersonagem() {
+      window.location.href = 'personagem.html';
+    }
 
     function selecionarProfissao(nome, elemento) {
       // Remove seleção anterior
@@ -793,22 +940,32 @@
       // Mostrar loading
       document.getElementById('load').style.display = 'block';
 
-      // Simular envio de dados (substitua com sua lógica real de backend)
+      // Simular envio de dados
       setTimeout(() => {
-        const personagem = {
-          nome: nome,
-          senha: senha,
-          profissao: profissaoSelecionada,
-          descricao: desc,
-          foto: foto,
-          itens: itensSelecionados,
-          dataCriacao: new Date().toISOString()
+        const stats = {
+          'Guerreiro': { vida: 120, ataque: 20, defesa: 15 },
+          'Mago': { vida: 80, ataque: 25, defesa: 8 },
+          'Arqueiro': { vida: 100, ataque: 22, defesa: 10 },
+          'Clérigo': { vida: 110, ataque: 15, defesa: 12 }
         };
 
-        // Armazenar no localStorage (desenvolvimento) ou enviar ao servidor
-        let personagens = JSON.parse(localStorage.getItem('personagens')) || [];
-        personagens.push(personagem);
-        localStorage.setItem('personagens', JSON.stringify(personagens));
+        const statPersonagem = stats[profissaoSelecionada] || { vida: 100, ataque: 15, defesa: 10 };
+
+        // Salvar dados no localStorage
+        localStorage.setItem('personagem_nome', nome);
+        localStorage.setItem('personagem_senha', senha);
+        localStorage.setItem('personagem_classe', profissaoSelecionada);
+        localStorage.setItem('personagem_desc', desc);
+        localStorage.setItem('personagem_foto', foto);
+        localStorage.setItem('personagem_itens', JSON.stringify(itensSelecionados));
+        localStorage.setItem('personagem_nivel', '1');
+        localStorage.setItem('personagem_xp', '0');
+        localStorage.setItem('personagem_exp', '0');
+        localStorage.setItem('personagem_stats', JSON.stringify(statPersonagem));
+        localStorage.setItem('personagem_hp', statPersonagem.vida);
+        localStorage.setItem('personagem_energia', '50');
+        localStorage.setItem('inimigos_derotados', '0');
+        localStorage.setItem('data_criacao', new Date().toISOString());
 
         document.getElementById('load').style.display = 'none';
         mostrarMensagem('✨ Personagem criado com sucesso!', 'sucesso');
