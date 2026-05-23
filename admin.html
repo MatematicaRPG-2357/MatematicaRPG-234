@@ -629,6 +629,10 @@
     .usuarios-section::-webkit-scrollbar-thumb:hover {
       background: #cc0000;
     }
+
+    .hidden {
+      display: none;
+    }
   </style>
 </head>
 
@@ -821,20 +825,27 @@
     }
 
     function carregarUsuarios() {
-      // Simula carregamento de usuários do localStorage
+      // Buscar personagem do localStorage
       const nome = localStorage.getItem('personagem_nome');
       const classe = localStorage.getItem('personagem_classe');
 
       if (nome) {
+        const classeEmoji = {
+          'Guerreiro': '⚔️',
+          'Mago': '🔮',
+          'Arqueiro': '🏹',
+          'Clérigo': '✨'
+        };
+
         usuariosData = [
           {
             nome: nome,
             classe: classe || 'Guerreiro',
-            avatar: '⚔️',
-            hp: 100,
-            energia: 50,
-            xp: 0,
-            nivel: 1
+            avatar: classeEmoji[classe] || '👤',
+            hp: parseInt(localStorage.getItem('personagem_hp')) || 100,
+            energia: parseInt(localStorage.getItem('personagem_energia')) || 50,
+            xp: parseInt(localStorage.getItem('personagem_xp')) || 0,
+            nivel: parseInt(localStorage.getItem('personagem_nivel')) || 1
           }
         ];
 
@@ -905,6 +916,7 @@
       if (!personagemSelecionado) return;
       personagemSelecionado.hp += valor;
       document.getElementById('hpAtual').textContent = personagemSelecionado.hp;
+      localStorage.setItem('personagem_hp', personagemSelecionado.hp);
       mostrarSucesso('sucessoHP', `✅ +${valor} HP adicionado!`);
     }
 
@@ -922,6 +934,7 @@
       if (!personagemSelecionado) return;
       personagemSelecionado.energia = Math.min(personagemSelecionado.energia + valor, 100);
       document.getElementById('energiaAtual').textContent = personagemSelecionado.energia;
+      localStorage.setItem('personagem_energia', personagemSelecionado.energia);
       mostrarSucesso('sucessoEnergia', `✅ +${valor} Energia adicionada!`);
     }
 
@@ -939,6 +952,7 @@
       if (!personagemSelecionado) return;
       personagemSelecionado.xp += valor;
       document.getElementById('xpAtual').textContent = personagemSelecionado.xp;
+      localStorage.setItem('personagem_xp', personagemSelecionado.xp);
       mostrarSucesso('sucessoXP', `✅ +${valor} XP adicionado!`);
     }
 
