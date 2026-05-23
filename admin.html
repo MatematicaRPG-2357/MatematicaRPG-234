@@ -720,7 +720,7 @@
               </div>
               <div class="input-container full">
                 <input type="number" id="hpCustom" placeholder="Digite a quantidade..." min="1">
-                <button type="button" class="btn-aplicar" onclick="adicionarHPCustom()">Aplicar HP Customizado</button>
+                <button type="button" class="btn-aplicar" onclick="adicionarHPCustom()">Aplicar HP</button>
               </div>
               <div class="sucesso-mensagem" id="sucessoHP"></div>
             </div>
@@ -744,7 +744,7 @@
               </div>
               <div class="input-container full">
                 <input type="number" id="energiaCustom" placeholder="Digite a quantidade..." min="1">
-                <button type="button" class="btn-aplicar" onclick="adicionarEnergiaCustom()">Aplicar Energia Custom</button>
+                <button type="button" class="btn-aplicar" onclick="adicionarEnergiaCustom()">Aplicar Energia</button>
               </div>
               <div class="sucesso-mensagem" id="sucessoEnergia"></div>
             </div>
@@ -769,7 +769,7 @@
               </div>
               <div class="input-container full">
                 <input type="number" id="xpCustom" placeholder="Digite a quantidade..." min="1">
-                <button type="button" class="btn-aplicar" onclick="adicionarXPCustom()">Aplicar XP Customizado</button>
+                <button type="button" class="btn-aplicar" onclick="adicionarXPCustom()">Aplicar XP</button>
               </div>
               <div class="sucesso-mensagem" id="sucessoXP"></div>
             </div>
@@ -817,11 +817,11 @@
     }
 
     function voltarHome() {
-      window.location.href = '/index.html';
+      window.location.href = './index.html';
     }
 
     function fazerLogout() {
-      window.location.href = '/index.html';
+      window.location.href = './index.html';
     }
 
     function carregarUsuarios() {
@@ -837,12 +837,21 @@
           'Clérigo': '✨'
         };
 
+        const stats = {
+          'Guerreiro': { vida: 120 },
+          'Mago': { vida: 80 },
+          'Arqueiro': { vida: 100 },
+          'Clérigo': { vida: 110 }
+        };
+
+        const statPersonagem = stats[classe] || { vida: 100 };
+
         usuariosData = [
           {
             nome: nome,
             classe: classe || 'Guerreiro',
             avatar: classeEmoji[classe] || '👤',
-            hp: parseInt(localStorage.getItem('personagem_hp')) || 100,
+            hp: parseInt(localStorage.getItem('personagem_hp')) || statPersonagem.vida,
             energia: parseInt(localStorage.getItem('personagem_energia')) || 50,
             xp: parseInt(localStorage.getItem('personagem_xp')) || 0,
             nivel: parseInt(localStorage.getItem('personagem_nivel')) || 1
