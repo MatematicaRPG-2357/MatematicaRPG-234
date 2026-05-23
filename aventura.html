@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Aventura</title>
+
+<style>
+body {
+  background:#0a0f2c;
+  color:white;
+  text-align:center;
+  font-family:Arial;
+  padding:20px;
+}
+
+.box {
+  background:#141932;
+  border:2px solid #f5c542;
+  border-radius:15px;
+  padding:20px;
+  margin:20px auto;
+  max-width:400px;
+}
+
+button {
+  display:block;
+  width:100%;
+  margin:10px 0;
+  padding:15px;
+  font-size:16px;
+  background:#f5c542;
+  border:none;
+  border-radius:10px;
+  cursor:pointer;
+}
+</style>
+</head>
+
+<body>
+
+<div class="box" id="tela"></div>
+
+<script>
+let inimigos = [
+  {nome:"Goblin Zé", fala:"Grrr... humano fraco!", vida:40},
+  {nome:"Orc Bruto", fala:"Eu esmagar você!", vida:50},
+  {nome:"Esqueleto Sombrio", fala:"Você não deveria estar aqui...", vida:45},
+  {nome:"Mago Caído", fala:"Vou testar seu conhecimento!", vida:55},
+  {nome:"Cavaleiro Corrompido", fala:"Honra... já não existe...", vida:60}
+];
+
+let boss = {nome:"DRAGÃO SUPREMO", fala:"VOCÊ NÃO PASSARÁ!", vida:80};
+
+let fase = 0;
+let playerHP = 100;
+
+function telaInicio() {
+  let inimigo = inimigos[fase];
+
+  document.getElementById("tela").innerHTML = `
+    <h2>👹 ${inimigo.nome}</h2>
+    <p>${inimigo.fala}</p>
+
+    <button onclick="falar()">💬 Falar com ${inimigo.nome}</button>
+    <button onclick="voltar()">⬅ Voltar ao início</button>
+  `;
+}
+
+function falar() {
+  let inimigo = inimigos[fase];
+
+  gerarPergunta(inimigo);
+}
+
+function gerarPergunta(inimigo) {
+  let a = Math.floor(Math.random()*10)+1;
+  let b = Math.floor(Math.random()*10)+1;
+
+  let correta = a*b;
+
+  let opcoes = [correta];
+  while(opcoes.length < 4){
+    let fake = correta + Math.floor(Math.random()*10)-5;
+    if(!opcoes.includes(fake)) opcoes.push(fake);
+  }
+
+  opcoes.sort(()=>Math.random()-0.5);
+
+  let html = `
+    <h2>${inimigo.nome}</h2>
+    <p>${inimigo.fala}</p>
+    <h3>${a} × ${b} = ?</h3>
+  `;
+
+  opcoes.forEach(op=>{
+    html += `<button onclick="responder(${op}, ${correta})">${op}</button>`;
+  });
+
+  document.getElementById("tela").innerHTML = html;
+}
+
+function responder(resp, correta) {
+  let inimigo = inimigos[fase];
+  let dano;
+
+  if(resp === correta){
+    dano = Math.floor(Math.random()*15);
+    inimigo.vida -= dano;
+
+    alert(`✅ Você acertou! Deu ${dano} de dano!`);
+
+  } else {
+    dano = Math.floor(Math.random()*15);
+    playerHP -= dano;
+
+    alert(`❌ Errou! ${inimigo.nome} te deu ${dano} de dano!`);
+  }
+
+  if(playerHP <= 0){
+    fim("DERROTA 💀");
+    return;
+  }
+
+  if(inimigo.vida <= 0){
+    fase++;
+
+    if(fase >= inimigos.length){
+      bossInicio();
+      return;
+    }
+
+    telaInicio();
+    return;
+  }
+
+  gerarPergunta(inimigo);
+}
+
+function bossInicio(){
+  document.getElementById("tela").innerHTML = `
+    <h2>🐉 ${boss.nome}</h2>
+    <p>${boss.fala}</p>
+
+    <button onclick="bossLuta()">⚔ Enfrentar</button>
+  `;
+}
+
+let tempo;
+
+function bossLuta(){
+  let a = Math.floor(Math.random()*10)+5;
+  let b = Math.floor(Math.random()*10)+5;
+
+  let correta = a*b;
+
+  let html = `
+    <h2>🐉 ${boss.nome}</h2>
+    <h3>${a} × ${b} = ?</h3>
+    <p>⏳ Tempo: <span id="tempo">15</span></p>
+    <input id="resp">
+    <button onclick="responderBoss(${correta})">Responder</button>
+  `;
+
+  document.getElementById("tela").innerHTML = html;
+
+  let t = 15;
+  tempo = setInterval(()=>{
+    t--;
+    document.getElementById("tempo").innerText = t;
+
+    if(t <= 0){
+      clearInterval(tempo);
+      fim("DERROTA 💀 Você demorou!");
+    }
+  },1000);
+}
+
+function responderBoss(correta){
+  clearInterval(tempo);
+
+  let r = parseInt(document.getElementById("resp").value);
+
+  if(r === correta){
+    fim("🏆 VITÓRIA! Você venceu o Boss!");
+  } else {
+    fim("💀 DERROTA! O Boss te destruiu!");
+  }
+}
+
+function fim(msg){
+  document.getElementById("tela").innerHTML = `
+    <h1>${msg}</h1>
+    <button onclick="voltar()">⬅ Voltar</button>
+  `;
+}
+
+function voltar(){
+  window.location.href = "index.html";
+}
+
+telaInicio();
+</script>
+
+</body>
+</html>
